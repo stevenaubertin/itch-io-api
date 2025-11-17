@@ -1,5 +1,8 @@
 # Itch.io API
 
+![.NET CI](https://github.com/stevenaubertin/itch-io-api/workflows/.NET%20CI/badge.svg)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A .NET 10.0 Web API for interacting with the itch.io platform.
 
 ## Features
@@ -113,6 +116,34 @@ dotnet publish -c Release
 - ASP.NET Core 10.0
 - Swashbuckle.AspNetCore 10.0.1 (Swagger/OpenAPI)
 - Microsoft.OpenApi 2.3.0
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+
+- Development workflow
+- **Merge policy**: All PRs to `main` use **squash merge**
+- **Branch deletion**: Branches are automatically deleted after merge
+- Code style guidelines
+- Testing requirements
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and commit (`git commit -m 'Add amazing feature'`)
+4. Push to your branch (`git push -u origin feature/amazing-feature`)
+5. Open a Pull Request
+
+All PRs must pass CI checks before merging.
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration:
+
+- **Build and Test**: Automatically builds and tests the project on every PR
+- **Docker Build**: Validates Docker image builds
+- **Status checks required** before merging to `main`
 
 ## License
 
