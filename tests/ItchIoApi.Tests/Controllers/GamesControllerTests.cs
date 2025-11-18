@@ -164,4 +164,72 @@ public class GamesControllerTests
         // Assert
         Assert.IsType<BadRequestObjectResult>(result.Result);
     }
+
+    [Fact]
+    public async Task GetGameUploads_WithInvalidApiKey_ReturnsBadRequest()
+    {
+        // Arrange
+        _mockApiService
+            .Setup(s => s.GetGameUploadsAsync(123, It.IsAny<string>()))
+            .ReturnsAsync(ApiResponse<List<Upload>>.Error("Invalid API key"));
+
+        // Act
+        var result = await _controller.GetGameUploads(123, "invalid-key");
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task GetGameUploads_WithEmptyResult_ReturnsEmptyList()
+    {
+        // Arrange
+        var expectedUploads = new List<Upload>();
+
+        _mockApiService
+            .Setup(s => s.GetGameUploadsAsync(123, It.IsAny<string>()))
+            .ReturnsAsync(ApiResponse<List<Upload>>.Success(expectedUploads));
+
+        // Act
+        var result = await _controller.GetGameUploads(123, "test-api-key");
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var uploads = Assert.IsAssignableFrom<IEnumerable<Upload>>(okResult.Value);
+        Assert.Empty(uploads);
+    }
+
+    [Fact]
+    public async Task SearchGames_WithApiError_ReturnsBadRequest()
+    {
+        // Arrange
+        _mockApiService
+            .Setup(s => s.SearchGamesAsync("test", 1, It.IsAny<string>()))
+            .ReturnsAsync(ApiResponse<SearchResponse>.Error("Search service unavailable"));
+
+        // Act
+        var result = await _controller.SearchGames("test", 1);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task GetMyGames_WithEmptyResult_ReturnsEmptyList()
+    {
+        // Arrange
+        var expectedGames = new List<ItchGame>();
+
+        _mockApiService
+            .Setup(s => s.GetMyGamesAsync(It.IsAny<string>()))
+            .ReturnsAsync(ApiResponse<List<ItchGame>>.Success(expectedGames));
+
+        // Act
+        var result = await _controller.GetMyGames("test-api-key");
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var games = Assert.IsAssignableFrom<IEnumerable<ItchGame>>(okResult.Value);
+        Assert.Empty(games);
+    }
 }
