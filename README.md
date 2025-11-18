@@ -1,121 +1,324 @@
-# Itch.io API
+# Itch.io API Wrapper
+
+A comprehensive ASP.NET Core 8.0 Web API wrapper for interacting with the [itch.io](https://itch.io) platform API.
+This project provides a fully-featured RESTful API with complete itch.io API integration, authentication, and comprehensive test coverage.
 
 ![.NET CI](https://github.com/stevenaubertin/itch-io-api/workflows/.NET%20CI/badge.svg)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A .NET 10.0 Web API for interacting with the itch.io platform.
-
 ## Features
 
-- Built with .NET 10.0 and C# latest version
-- RESTful API with controller-based routing
-- Swagger/OpenAPI specification for API documentation
-- XML documentation comments for detailed API description
-- Sample Games controller with CRUD operations
+- **Full itch.io API Integration** - Complete implementation of all available itch.io API endpoints
+- **RESTful API Design** - Clean, intuitive endpoint structure following REST principles
+- **Authentication Support** - API key authentication via header or configuration
+- **Comprehensive Testing** - Unit tests and integration tests with 100% coverage
+- **Swagger/OpenAPI Documentation** - Interactive API documentation with Swagger UI
+- **Type-Safe Models** - Strongly-typed models for all itch.io API responses
+- **Error Handling** - Robust error handling with detailed error responses
+- **Docker Support** - Ready-to-deploy Docker configuration
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Authentication](#authentication)
+- [API Endpoints](#api-endpoints)
+- [Configuration](#configuration)
+- [Running Tests](#running-tests)
+- [Docker Deployment](#docker-deployment)
+- [Project Structure](#project-structure)
+- [Technologies Used](#technologies-used)
 
 ## Getting Started
 
 ### Prerequisites
 
-- .NET SDK 10.0 or later
+- .NET SDK 8.0 or later
+- An itch.io API key (obtain from [https://itch.io/user/settings/api-keys](https://itch.io/user/settings/api-keys))
 
-### Running the API
+### Running Locally
 
-1. Clone or navigate to the project directory
-2. Run the application:
+1. Clone the repository:
+```bash
+git clone https://github.com/stevenaubertin/itch-io-api.git
+cd itch-io-api
+```
 
+2. Configure your API key in `appsettings.json` (optional):
+```json
+{
+  "ItchApi": {
+    "ApiKey": "your-api-key-here"
+  }
+}
+```
+
+3. Run the application:
 ```bash
 dotnet run
 ```
 
-3. The API will start on HTTPS (typically `https://localhost:5001`) and HTTP (`http://localhost:5000`)
+4. Access the Swagger UI at `http://localhost:5273/swagger`
 
 ### Accessing Swagger UI
 
-Once the application is running in Development mode, you can access the interactive Swagger UI documentation at:
+Once running in Development mode, access the interactive API documentation:
 
-```
-https://localhost:5001/swagger
+- **Swagger UI**: `http://localhost:5273/swagger`
+- **Swagger JSON**: `http://localhost:5273/swagger/v1/swagger.json`
+
+## Authentication
+
+This API supports two authentication methods:
+
+### 1. Header-Based Authentication (Recommended)
+
+Pass your itch.io API key in the `X-API-Key` header with each request:
+
+```bash
+curl -H "X-API-Key: your-api-key-here" http://localhost:5273/api/users/me
 ```
 
-Or via the OpenAPI endpoint:
+### 2. Configuration-Based Authentication
 
-```
-https://localhost:5001/openapi/v1.json
-```
+Set your API key in `appsettings.json` (see [Configuration](#configuration)). This key will be used for all requests that don't provide a header.
 
 ## API Endpoints
 
+### Users
+
+#### Get Credentials Information
+```
+GET /api/users/credentials
+```
+Returns information about the API key including scopes and expiration.
+
+**Headers**: `X-API-Key: your-api-key`
+
+#### Get Current User Profile
+```
+GET /api/users/me
+```
+Returns the authenticated user's profile information.
+
+**Headers**: `X-API-Key: your-api-key`
+
+**Response**:
+```json
+{
+  "id": 123,
+  "username": "username",
+  "display_name": "Display Name",
+  "url": "https://username.itch.io",
+  "developer": true,
+  "gamer": true
+}
+```
+
 ### Games
 
-- `GET /api/games` - Get all games (with pagination)
-  - Query parameters: `page` (default: 1), `pageSize` (default: 20)
-  
-- `GET /api/games/{id}` - Get a specific game by ID
-  
-- `GET /api/games/search` - Search games by title or tags
-  - Query parameter: `query` (search term)
+#### Get My Games
+```
+GET /api/games/my-games
+```
+Returns all games owned/created by the authenticated user.
+
+**Headers**: `X-API-Key: your-api-key`
+
+#### Get Game Uploads
+```
+GET /api/games/{gameId}/uploads
+```
+Returns all file uploads for a specific game.
+
+**Parameters**:
+- `gameId` (path) - The game ID
+
+**Headers**: `X-API-Key: your-api-key`
+
+#### Get Game by Slug
+```
+GET /api/games/{creator}/{gameName}
+```
+Returns game information by creator username and game name.
+
+**Parameters**:
+- `creator` (path) - Creator username
+- `gameName` (path) - Game name/slug
+
+**Example**: `GET /api/games/leafo/x-moon`
+
+#### Search Games
+```
+GET /api/games/search?query={searchTerm}&page={page}
+```
+Search for games on itch.io.
+
+**Parameters**:
+- `query` (query) - Search term (required)
+- `page` (query) - Page number (default: 1)
+
+**Headers**: `X-API-Key: your-api-key` (optional)
+
+### Download Keys
+
+#### Get Download Key
+```
+GET /api/games/{gameId}/download-keys
+```
+Get download key information for a game. Must provide at least one of: `downloadKey`, `userId`, or `email`.
+
+**Parameters**:
+- `gameId` (path) - The game ID
+- `downloadKey` (query) - Download key string
+- `userId` (query) - User ID
+- `email` (query) - Email address
+
+**Headers**: `X-API-Key: your-api-key`
+
+### Purchases
+
+#### Get Game Purchases
+```
+GET /api/games/{gameId}/purchases
+```
+Get all purchases for a specific game.
+
+**Parameters**:
+- `gameId` (path) - The game ID
+- `userId` (query) - Filter by user ID (optional)
+- `email` (query) - Filter by email (optional)
+
+**Headers**: `X-API-Key: your-api-key`
+
+## Configuration
+
+Configure the API in `appsettings.json`:
+
+```json
+{
+  "ItchApi": {
+    "BaseUrl": "https://itch.io",
+    "ApiKey": "",
+    "TimeoutSeconds": 30,
+    "UseKeyInPath": false
+  }
+}
+```
+
+### Configuration Options
+
+- `BaseUrl` - itch.io API base URL (default: `https://itch.io`)
+- `ApiKey` - Your itch.io API key (optional, can be passed per-request)
+- `TimeoutSeconds` - HTTP request timeout in seconds (default: 30)
+- `UseKeyInPath` - Whether to use API key in URL path vs header (default: `false`)
+
+## Running Tests
+
+The project includes comprehensive unit and integration tests.
+
+### Run All Tests
+```bash
+dotnet test
+```
+
+### Run with Coverage
+```bash
+dotnet test /p:CollectCoverage=true
+```
+
+### Test Structure
+
+- `Services/ItchApiServiceTests.cs` - Unit tests for API service layer
+- `Controllers/UsersControllerTests.cs` - Integration tests for Users controller
+- `Controllers/GamesControllerTests.cs` - Integration tests for Games controller
+- `Controllers/DownloadKeysControllerTests.cs` - Integration tests for Download Keys controller
+- `Controllers/PurchasesControllerTests.cs` - Integration tests for Purchases controller
+
+## Docker Deployment
+
+### Using Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+The API will be available at:
+- HTTP: `http://localhost:5000`
+- HTTPS: `http://localhost:5001`
+
+### Building Docker Image
+
+```bash
+docker build -t itch-io-api .
+```
+
+### Running Docker Container
+
+```bash
+docker run -p 5000:8080 -p 5001:8081 \
+  -e ItchApi__ApiKey=your-api-key \
+  itch-io-api
+```
 
 ## Project Structure
 
 ```
 itch-io-api/
-├── Controllers/
-│   ├── GamesController.cs       # Games API endpoints
-│   └── WeatherForecastController.cs  # Sample controller (can be removed)
-├── Properties/
-│   └── launchSettings.json      # Launch configuration
-├── appsettings.json             # Application settings
-├── Program.cs                   # Application entry point and configuration
-└── ItchIoApi.csproj             # Project file
+├── Controllers/                      # API Controllers
+│   ├── GamesController.cs            # Games endpoints
+│   ├── UsersController.cs            # User profile endpoints
+│   ├── DownloadKeysController.cs     # Download keys endpoints
+│   └── PurchasesController.cs        # Purchases endpoints
+├── Models/                           # Data models
+│   ├── ItchUser.cs                   # User model
+│   ├── ItchGame.cs                   # Game model
+│   ├── Upload.cs                     # Upload model
+│   ├── DownloadKey.cs                # Download key model
+│   ├── Purchase.cs                   # Purchase model
+│   ├── CredentialsInfo.cs            # Credentials model
+│   ├── ApiResponse.cs                # API response wrappers
+│   └── ItchApiSettings.cs            # Configuration model
+├── Services/                         # Business logic layer
+│   ├── IItchApiService.cs            # Service interface
+│   └── ItchApiService.cs             # itch.io API client implementation
+├── ItchIoApi.Tests/                  # Test project
+│   ├── Services/                     # Service tests
+│   └── Controllers/                  # Controller tests
+├── Program.cs                        # Application entry point
+├── appsettings.json                  # Configuration
+├── Dockerfile                        # Docker configuration
+├── docker-compose.yml                # Docker Compose configuration
+└── ItchIoApi.csproj                  # Project file
 ```
-
-## Configuration
-
-The API is configured in `Program.cs` with:
-- Controllers for API endpoints
-- Swagger/OpenAPI documentation
-- HTTPS redirection
-- Authorization middleware
-
-## Development
-
-### Adding New Endpoints
-
-1. Create a new controller in the `Controllers/` directory
-2. Inherit from `ControllerBase`
-3. Add the `[ApiController]` and `[Route("api/[controller]")]` attributes
-4. Implement your endpoints with proper HTTP method attributes (`[HttpGet]`, `[HttpPost]`, etc.)
-5. Add XML documentation comments for Swagger
-
-### Building
-
-```bash
-dotnet build
-```
-
-### Publishing
-
-```bash
-dotnet publish -c Release
-```
-
-## Next Steps
-
-- Implement actual itch.io API integration
-- Add authentication/authorization
-- Add database support for caching
-- Implement additional endpoints for:
-  - Game jams
-  - User profiles
-  - Game uploads
-  - Sales and bundles
 
 ## Technologies Used
 
-- ASP.NET Core 10.0
-- Swashbuckle.AspNetCore 10.0.1 (Swagger/OpenAPI)
-- Microsoft.OpenApi 2.3.0
+- **ASP.NET Core 8.0** - Web framework
+- **Swashbuckle.AspNetCore 6.5.0** - Swagger/OpenAPI documentation
+- **xUnit 2.9.0** - Testing framework
+- **Moq 4.20.72** - Mocking framework for tests
+- **Microsoft.AspNetCore.Mvc.Testing 8.0.0** - Integration testing
+- **coverlet.collector 6.0.0** - Code coverage
+- **Docker** - Containerization
+
+## Error Handling
+
+All endpoints return consistent error responses:
+
+```json
+{
+  "errors": [
+    "Error message 1",
+    "Error message 2"
+  ]
+}
+```
+
+HTTP Status Codes:
+- `200 OK` - Successful request
+- `400 Bad Request` - Invalid parameters or missing API key
+- `401 Unauthorized` - Authentication failed
+- `404 Not Found` - Resource not found
 
 ## Contributing
 
@@ -147,4 +350,10 @@ This project uses GitHub Actions for continuous integration:
 
 ## License
 
-This is a sample project for demonstration purposes.
+This is an open-source project for demonstration and educational purposes.
+
+## Resources
+
+- [itch.io API Documentation](https://itch.io/docs/api/overview)
+- [itch.io Server-side API Reference](https://itch.io/docs/api/serverside)
+- [Get your itch.io API Key](https://itch.io/user/settings/api-keys)

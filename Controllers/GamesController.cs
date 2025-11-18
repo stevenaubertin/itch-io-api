@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using ItchIoApi.Models;
+using ItchIoApi.Services;
 
 namespace ItchIoApi.Controllers;
 
@@ -10,130 +12,128 @@ namespace ItchIoApi.Controllers;
 [Produces("application/json")]
 public class GamesController : ControllerBase
 {
+    private readonly IItchApiService _itchApiService;
     private readonly ILogger<GamesController> _logger;
 
-    public GamesController(ILogger<GamesController> logger)
+    public GamesController(IItchApiService itchApiService, ILogger<GamesController> logger)
     {
+        _itchApiService = itchApiService;
         _logger = logger;
     }
 
     /// <summary>
-    /// Get all games
+    /// Get all games owned by the authenticated user
     /// </summary>
-    /// <param name="page">Page number (default: 1)</param>
-    /// <param name="pageSize">Number of items per page (default: 20)</param>
-    /// <returns>List of games</returns>
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<IEnumerable<Game>> GetGames([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    /// <param name="apiKey">itch.io API key (optional if configured in settings)</param>
+    /// <returns>List of user's games</returns>
+    /// <response code="200">Returns the list of games</response>
+    /// <response code="400">If the API key is missing or invalid</response>
+    /// <response code="401">If authentication fails</response>
+    [HttpGet("my-games")]
+    [ProducesResponseType(typeof(IEnumerable<ItchGame>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<ItchGame>>> GetMyGames([FromHeader(Name = "X-API-Key")] string? apiKey = null)
     {
-        _logger.LogInformation("Getting games - Page: {Page}, PageSize: {PageSize}", page, pageSize);
-        
-        // TODO: Implement actual itch.io API integration
-        return Ok(new[] 
-        { 
-            new Game 
-            { 
-                Id = 1, 
-                Title = "Sample Game", 
-                Developer = "Sample Developer",
-                Price = 9.99m,
-                Description = "A sample game from itch.io",
-                Tags = new[] { "indie", "adventure" }
-            } 
-        });
+        _logger.LogInformation("Getting user's games");
+
+        var response = await _itchApiService.GetMyGamesAsync(apiKey);
+
+        if (!response.IsSuccess)
+        {
+            _logger.LogWarning("Failed to get games: {Errors}", string.Join(", ", response.Errors ?? new List<string>()));
+            return BadRequest(new { errors = response.Errors });
+        }
+
+        return Ok(response.Data);
     }
 
     /// <summary>
-    /// Get a specific game by ID
+    /// Get uploads for a specific game
     /// </summary>
-    /// <param name="id">Game ID</param>
-    /// <returns>Game details</returns>
-    [HttpGet("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    /// <param name="gameId">Game ID</param>
+    /// <param name="apiKey">itch.io API key (optional if configured in settings)</param>
+    /// <returns>List of game uploads</returns>
+    /// <response code="200">Returns the list of uploads</response>
+    /// <response code="400">If the API key is missing or invalid</response>
+    /// <response code="404">If the game is not found</response>
+    [HttpGet("{gameId}/uploads")]
+    [ProducesResponseType(typeof(IEnumerable<Upload>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<Game> GetGame(int id)
+    public async Task<ActionResult<IEnumerable<Upload>>> GetGameUploads(int gameId, [FromHeader(Name = "X-API-Key")] string? apiKey = null)
     {
-        _logger.LogInformation("Getting game with ID: {Id}", id);
-        
-        // TODO: Implement actual itch.io API integration
-        var game = new Game 
-        { 
-            Id = id, 
-            Title = "Sample Game", 
-            Developer = "Sample Developer",
-            Price = 9.99m,
-            Description = "A sample game from itch.io",
-            Tags = new[] { "indie", "adventure" }
-        };
+        _logger.LogInformation("Getting uploads for game {GameId}", gameId);
 
-        return Ok(game);
+        var response = await _itchApiService.GetGameUploadsAsync(gameId, apiKey);
+
+        if (!response.IsSuccess)
+        {
+            _logger.LogWarning("Failed to get uploads for game {GameId}: {Errors}", gameId, string.Join(", ", response.Errors ?? new List<string>()));
+            return BadRequest(new { errors = response.Errors });
+        }
+
+        return Ok(response.Data);
     }
 
     /// <summary>
-    /// Search games by title or tags
+    /// Get game data by creator and game name
+    /// </summary>
+    /// <param name="creator">Creator username</param>
+    /// <param name="gameName">Game name/slug</param>
+    /// <returns>Game details</returns>
+    /// <response code="200">Returns the game details</response>
+    /// <response code="404">If the game is not found</response>
+    [HttpGet("{creator}/{gameName}")]
+    [ProducesResponseType(typeof(ItchGame), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ItchGame>> GetGameBySlug(string creator, string gameName)
+    {
+        _logger.LogInformation("Getting game data for {Creator}/{GameName}", creator, gameName);
+
+        var response = await _itchApiService.GetGameDataAsync(creator, gameName);
+
+        if (!response.IsSuccess)
+        {
+            _logger.LogWarning("Failed to get game {Creator}/{GameName}: {Errors}", creator, gameName, string.Join(", ", response.Errors ?? new List<string>()));
+            return NotFound(new { errors = response.Errors });
+        }
+
+        return Ok(response.Data);
+    }
+
+    /// <summary>
+    /// Search games by query
     /// </summary>
     /// <param name="query">Search query</param>
-    /// <returns>List of matching games</returns>
+    /// <param name="page">Page number (default: 1)</param>
+    /// <param name="apiKey">itch.io API key (optional)</param>
+    /// <returns>Search results</returns>
+    /// <response code="200">Returns the search results</response>
+    /// <response code="400">If the query is invalid</response>
     [HttpGet("search")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<IEnumerable<Game>> SearchGames([FromQuery] string query)
+    [ProducesResponseType(typeof(SearchResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<SearchResponse>> SearchGames(
+        [FromQuery] string query,
+        [FromQuery] int page = 1,
+        [FromHeader(Name = "X-API-Key")] string? apiKey = null)
     {
-        _logger.LogInformation("Searching games with query: {Query}", query);
-        
-        // TODO: Implement actual itch.io API integration
-        return Ok(new[] 
-        { 
-            new Game 
-            { 
-                Id = 1, 
-                Title = $"Game matching '{query}'", 
-                Developer = "Sample Developer",
-                Price = 9.99m,
-                Description = "A sample game from itch.io",
-                Tags = new[] { "indie", query.ToLower() }
-            } 
-        });
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return BadRequest(new { errors = new[] { "Query parameter is required" } });
+        }
+
+        _logger.LogInformation("Searching games with query: {Query}, page: {Page}", query, page);
+
+        var response = await _itchApiService.SearchGamesAsync(query, page, apiKey);
+
+        if (!response.IsSuccess)
+        {
+            _logger.LogWarning("Search failed for query '{Query}': {Errors}", query, string.Join(", ", response.Errors ?? new List<string>()));
+            return BadRequest(new { errors = response.Errors });
+        }
+
+        return Ok(response.Data);
     }
-}
-
-/// <summary>
-/// Represents a game on itch.io
-/// </summary>
-public class Game
-{
-    /// <summary>
-    /// Unique game identifier
-    /// </summary>
-    public int Id { get; set; }
-
-    /// <summary>
-    /// Game title
-    /// </summary>
-    public required string Title { get; set; }
-
-    /// <summary>
-    /// Game developer/creator
-    /// </summary>
-    public required string Developer { get; set; }
-
-    /// <summary>
-    /// Game description
-    /// </summary>
-    public string? Description { get; set; }
-
-    /// <summary>
-    /// Game price (null for free games)
-    /// </summary>
-    public decimal? Price { get; set; }
-
-    /// <summary>
-    /// Game tags/categories
-    /// </summary>
-    public string[]? Tags { get; set; }
-
-    /// <summary>
-    /// Release date
-    /// </summary>
-    public DateTime? ReleaseDate { get; set; }
 }

@@ -1,6 +1,142 @@
 @ItchIoApi_HostAddress = http://localhost:5273
+@ApiKey = YOUR_ITCH_IO_API_KEY_HERE
 
-GET {{ItchIoApi_HostAddress}}/weatherforecast/
+### ==============================================================================
+### User Endpoints
+### ==============================================================================
+
+### Get credentials information
+# Returns information about the API key including scopes and expiration
+GET {{ItchIoApi_HostAddress}}/api/users/credentials
+X-API-Key: {{ApiKey}}
 Accept: application/json
 
 ###
+
+### Get current user profile
+# Returns the authenticated user's profile information
+GET {{ItchIoApi_HostAddress}}/api/users/me
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### ==============================================================================
+### Games Endpoints
+### ==============================================================================
+
+### Get my games
+# Returns all games owned by the authenticated user
+GET {{ItchIoApi_HostAddress}}/api/games/my-games
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### Get game by slug
+# Get public game information by creator and game name
+# Example: Getting "a-short-hike" by "adamgryu"
+GET {{ItchIoApi_HostAddress}}/api/games/adamgryu/a-short-hike
+Accept: application/json
+
+###
+
+### Get game uploads
+# Returns all uploads (files) for a specific game
+# Replace {gameId} with actual game ID
+GET {{ItchIoApi_HostAddress}}/api/games/123456/uploads
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### Search games
+# Search for games by query with optional pagination
+GET {{ItchIoApi_HostAddress}}/api/games/search?query=platformer&page=1
+Accept: application/json
+
+###
+
+### Search games (with API key for authenticated search)
+GET {{ItchIoApi_HostAddress}}/api/games/search?query=puzzle&page=1
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### ==============================================================================
+### Purchases Endpoints
+### ==============================================================================
+
+### Get all purchases for a game
+# Returns all purchases for a specific game (requires game ownership)
+# Replace {gameId} with actual game ID
+GET {{ItchIoApi_HostAddress}}/api/games/123456/purchases
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### Get purchases filtered by user ID
+# Get purchases for a specific user
+GET {{ItchIoApi_HostAddress}}/api/games/123456/purchases?userId=789
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### Get purchases filtered by email
+# Get purchases for a specific email address
+GET {{ItchIoApi_HostAddress}}/api/games/123456/purchases?email=user@example.com
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### ==============================================================================
+### Download Keys Endpoints
+### ==============================================================================
+
+### Get download key by key string
+# Get download key information using the key string
+# Replace {gameId} with actual game ID and {key} with actual download key
+GET {{ItchIoApi_HostAddress}}/api/games/123456/download-keys?downloadKey=abcd-efgh-1234-5678
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### Get download key by user ID
+# Get download key information for a specific user
+GET {{ItchIoApi_HostAddress}}/api/games/123456/download-keys?userId=789
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### Get download key by email
+# Get download key information for a specific email
+GET {{ItchIoApi_HostAddress}}/api/games/123456/download-keys?email=user@example.com
+X-API-Key: {{ApiKey}}
+Accept: application/json
+
+###
+
+### ==============================================================================
+### Notes:
+###
+### 1. Replace {{ApiKey}} with your actual itch.io API key from:
+###    https://itch.io/user/settings/api-keys
+###
+### 2. Replace game IDs (123456) with actual game IDs from your itch.io account
+###
+### 3. The API key can be provided via:
+###    - X-API-Key header (as shown in examples)
+###    - Configuration in appsettings.json
+###
+### 4. For testing in development, you can also access Swagger UI at:
+###    http://localhost:5273/swagger
+###
+### 5. Some endpoints (like game search by slug) don't require authentication
+###    while others (like my-games, purchases, download-keys) require an API key
+### ==============================================================================
