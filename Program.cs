@@ -18,8 +18,6 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
 
         // Add Swagger/OpenAPI documentation
         builder.Services.AddEndpointsApiExplorer();
@@ -45,8 +43,8 @@ public class Program
 
             // Include XML comments for better documentation
             var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFilename);
-            if (System.IO.File.Exists(xmlPath))
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+            if (File.Exists(xmlPath))
             {
                 options.IncludeXmlComments(xmlPath);
             }
@@ -57,7 +55,6 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {

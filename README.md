@@ -1,6 +1,6 @@
 # Itch.io API Wrapper
 
-A comprehensive ASP.NET Core 10.0 Web API wrapper for interacting with the [itch.io](https://itch.io) platform API. 
+A comprehensive ASP.NET Core 8.0 Web API wrapper for interacting with the [itch.io](https://itch.io) platform API.
 This project provides a fully-featured RESTful API with complete itch.io API integration, authentication, and comprehensive test coverage.
 
 ![.NET CI](https://github.com/stevenaubertin/itch-io-api/workflows/.NET%20CI/badge.svg)
@@ -32,14 +32,14 @@ This project provides a fully-featured RESTful API with complete itch.io API int
 
 ### Prerequisites
 
-- .NET SDK 10.0 or later
+- .NET SDK 8.0 or later
 - An itch.io API key (obtain from [https://itch.io/user/settings/api-keys](https://itch.io/user/settings/api-keys))
 
 ### Running Locally
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/stevenaubertin/itch-io-api.git
 cd itch-io-api
 ```
 
@@ -57,14 +57,14 @@ cd itch-io-api
 dotnet run
 ```
 
-4. Access the Swagger UI at `https://localhost:7268/swagger`
+4. Access the Swagger UI at `http://localhost:5273/swagger`
 
 ### Accessing Swagger UI
 
 Once running in Development mode, access the interactive API documentation:
 
-- **Swagger UI**: `https://localhost:7268/swagger`
-- **OpenAPI JSON**: `https://localhost:7268/openapi/v1.json`
+- **Swagger UI**: `http://localhost:5273/swagger`
+- **Swagger JSON**: `http://localhost:5273/swagger/v1/swagger.json`
 
 ## Authentication
 
@@ -75,7 +75,7 @@ This API supports two authentication methods:
 Pass your itch.io API key in the `X-API-Key` header with each request:
 
 ```bash
-curl -H "X-API-Key: your-api-key-here" https://localhost:7268/api/users/me
+curl -H "X-API-Key: your-api-key-here" http://localhost:5273/api/users/me
 ```
 
 ### 2. Configuration-Based Authentication
@@ -218,7 +218,6 @@ The project includes comprehensive unit and integration tests.
 
 ### Run All Tests
 ```bash
-cd ItchIoApi.Tests
 dotnet test
 ```
 
@@ -294,11 +293,12 @@ itch-io-api/
 
 ## Technologies Used
 
-- **ASP.NET Core 10.0** - Web framework
-- **Swashbuckle.AspNetCore 10.0.1** - Swagger/OpenAPI documentation
+- **ASP.NET Core 8.0** - Web framework
+- **Swashbuckle.AspNetCore 6.5.0** - Swagger/OpenAPI documentation
 - **xUnit 2.9.0** - Testing framework
-- **Moq 4.20.0** - Mocking framework for tests
-- **Microsoft.AspNetCore.Mvc.Testing 10.0.0** - Integration testing
+- **Moq 4.20.72** - Mocking framework for tests
+- **Microsoft.AspNetCore.Mvc.Testing 8.0.0** - Integration testing
+- **coverlet.collector 6.0.0** - Code coverage
 - **Docker** - Containerization
 
 ## Error Handling
@@ -319,14 +319,6 @@ HTTP Status Codes:
 - `400 Bad Request` - Invalid parameters or missing API key
 - `401 Unauthorized` - Authentication failed
 - `404 Not Found` - Resource not found
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Ensure all tests pass
-5. Submit a pull request
 
 ## Contributing
 
