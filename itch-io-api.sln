@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItchIoApi", "ItchIoApi.csproj", "{F1E570E4-C2E1-7186-1593-53B3EA6B417B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItchIoApi", "src\ItchIoApi.csproj", "{F1E570E4-C2E1-7186-1593-53B3EA6B417B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItchIoApi.Tests", "ItchIoApi.Tests\ItchIoApi.Tests.csproj", "{B2E571F5-D3F2-8297-2604-64C4FB7C528C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItchIoApi.Tests", "tests\ItchIoApi.Tests\ItchIoApi.Tests.csproj", "{B2E571F5-D3F2-8297-2604-64C4FB7C528C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

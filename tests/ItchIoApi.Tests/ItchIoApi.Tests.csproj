@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../ItchIoApi.csproj" />
+    <ProjectReference Include="..\..\src\ItchIoApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

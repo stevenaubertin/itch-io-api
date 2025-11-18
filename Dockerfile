@@ -1,21 +1,21 @@
 # Use the official .NET SDK image for building
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY ["ItchIoApi.csproj", "./"]
-RUN dotnet restore "ItchIoApi.csproj"
+COPY ["src/ItchIoApi.csproj", "src/"]
+RUN dotnet restore "src/ItchIoApi.csproj"
 
 # Copy everything else and build
 COPY . .
-RUN dotnet build "ItchIoApi.csproj" -c Release -o /app/build
+RUN dotnet build "src/ItchIoApi.csproj" -c Release -o /app/build
 
 # Publish the application
 FROM build AS publish
-RUN dotnet publish "ItchIoApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "src/ItchIoApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Use the runtime image for the final stage
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
