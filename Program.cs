@@ -1,3 +1,6 @@
+using ItchIoApi.Models;
+using ItchIoApi.Services;
+
 namespace ItchIoApi;
 
 public class Program
@@ -6,20 +9,38 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Configure itch.io API settings
+        builder.Services.Configure<ItchApiSettings>(
+            builder.Configuration.GetSection(ItchApiSettings.SectionName));
+
+        // Register HttpClient and ItchApiService
+        builder.Services.AddHttpClient<IItchApiService, ItchApiService>();
+
         // Add services to the container.
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
-        
+
         // Add Swagger/OpenAPI documentation
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new() 
+            options.SwaggerDoc("v1", new()
             {
-                Title = "Itch.io API",
+                Title = "Itch.io API Wrapper",
                 Version = "v1",
-                Description = "API for interacting with itch.io platform"
+                Description = "ASP.NET Core API wrapper for interacting with the itch.io platform. " +
+                             "Provides endpoints for managing games, users, purchases, and download keys."
+            });
+
+            // Add API key header parameter for Swagger UI
+            options.AddSecurityDefinition("ApiKey", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Description = "itch.io API key. Can be obtained from https://itch.io/user/settings/api-keys",
+                Name = "X-API-Key",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                Scheme = "ApiKeyScheme"
             });
 
             // Include XML comments for better documentation
