@@ -1,6 +1,10 @@
 # Itch.io API Wrapper
 
-A comprehensive ASP.NET Core 10.0 Web API wrapper for interacting with the [itch.io](https://itch.io) platform API. This project provides a fully-featured RESTful API with complete itch.io API integration, authentication, and comprehensive test coverage.
+A comprehensive ASP.NET Core 10.0 Web API wrapper for interacting with the [itch.io](https://itch.io) platform API. 
+This project provides a fully-featured RESTful API with complete itch.io API integration, authentication, and comprehensive test coverage.
+
+![.NET CI](https://github.com/stevenaubertin/itch-io-api/workflows/.NET%20CI/badge.svg)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ## Features
 
@@ -323,6 +327,34 @@ HTTP Status Codes:
 3. Make your changes with tests
 4. Ensure all tests pass
 5. Submit a pull request
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+
+- Development workflow
+- **Merge policy**: All PRs to `main` use **squash merge**
+- **Branch deletion**: Branches are automatically deleted after merge
+- Code style guidelines
+- Testing requirements
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes and commit (`git commit -m 'Add amazing feature'`)
+4. Push to your branch (`git push -u origin feature/amazing-feature`)
+5. Open a Pull Request
+
+All PRs must pass CI checks before merging.
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration:
+
+- **Build and Test**: Automatically builds and tests the project on every PR
+- **Docker Build**: Validates Docker image builds
+- **Status checks required** before merging to `main`
 
 ## License
 
