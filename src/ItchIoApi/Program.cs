@@ -19,6 +19,9 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllers();
 
+        // Add health checks
+        builder.Services.AddHealthChecks();
+
         // Add Swagger/OpenAPI documentation
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
@@ -66,6 +69,10 @@ public class Program
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
+
+        // Map health check endpoint
+        app.MapHealthChecks("/health");
+
         app.Run();
     }
 }
