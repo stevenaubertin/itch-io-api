@@ -338,6 +338,162 @@ public class ItchApiServiceTests
         Assert.NotEmpty(result.Errors);
     }
 
+    [Fact]
+    public async Task GetMyGamesAsync_WithoutApiKey_ReturnsError()
+    {
+        // Arrange
+        var httpMessageHandler = CreateMockHttpMessageHandler(HttpStatusCode.OK, "{}");
+        var httpClient = new HttpClient(httpMessageHandler.Object)
+        {
+            BaseAddress = new Uri(_settings.BaseUrl)
+        };
+
+        var settingsWithoutKey = new ItchApiSettings
+        {
+            BaseUrl = "https://itch.io",
+            ApiKey = null
+        };
+        var options = Options.Create(settingsWithoutKey);
+
+        var service = new ItchApiService(httpClient, options, _mockLogger.Object);
+
+        // Act
+        var result = await service.GetMyGamesAsync();
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Contains("API key is required", result.Errors ?? new List<string>());
+    }
+
+    [Fact]
+    public async Task GetGameUploadsAsync_WithoutApiKey_ReturnsError()
+    {
+        // Arrange
+        var httpMessageHandler = CreateMockHttpMessageHandler(HttpStatusCode.OK, "{}");
+        var httpClient = new HttpClient(httpMessageHandler.Object)
+        {
+            BaseAddress = new Uri(_settings.BaseUrl)
+        };
+
+        var settingsWithoutKey = new ItchApiSettings
+        {
+            BaseUrl = "https://itch.io",
+            ApiKey = null
+        };
+        var options = Options.Create(settingsWithoutKey);
+
+        var service = new ItchApiService(httpClient, options, _mockLogger.Object);
+
+        // Act
+        var result = await service.GetGameUploadsAsync(123);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Contains("API key is required", result.Errors ?? new List<string>());
+    }
+
+    [Fact]
+    public async Task GetDownloadKeyAsync_WithoutApiKey_ReturnsError()
+    {
+        // Arrange
+        var httpMessageHandler = CreateMockHttpMessageHandler(HttpStatusCode.OK, "{}");
+        var httpClient = new HttpClient(httpMessageHandler.Object)
+        {
+            BaseAddress = new Uri(_settings.BaseUrl)
+        };
+
+        var settingsWithoutKey = new ItchApiSettings
+        {
+            BaseUrl = "https://itch.io",
+            ApiKey = null
+        };
+        var options = Options.Create(settingsWithoutKey);
+
+        var service = new ItchApiService(httpClient, options, _mockLogger.Object);
+
+        // Act
+        var result = await service.GetDownloadKeyAsync(123, downloadKey: "test-key");
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Contains("API key is required", result.Errors ?? new List<string>());
+    }
+
+    [Fact]
+    public async Task GetGamePurchasesAsync_WithoutApiKey_ReturnsError()
+    {
+        // Arrange
+        var httpMessageHandler = CreateMockHttpMessageHandler(HttpStatusCode.OK, "{}");
+        var httpClient = new HttpClient(httpMessageHandler.Object)
+        {
+            BaseAddress = new Uri(_settings.BaseUrl)
+        };
+
+        var settingsWithoutKey = new ItchApiSettings
+        {
+            BaseUrl = "https://itch.io",
+            ApiKey = null
+        };
+        var options = Options.Create(settingsWithoutKey);
+
+        var service = new ItchApiService(httpClient, options, _mockLogger.Object);
+
+        // Act
+        var result = await service.GetGamePurchasesAsync(123);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.Contains("API key is required", result.Errors ?? new List<string>());
+    }
+
+    [Fact]
+    public async Task GetGameDataAsync_WithHttpError_ReturnsErrorResponse()
+    {
+        // Arrange
+        var httpMessageHandler = CreateMockHttpMessageHandler(
+            HttpStatusCode.NotFound,
+            JsonSerializer.Serialize(new { errors = new[] { "Game not found" } }));
+
+        var httpClient = new HttpClient(httpMessageHandler.Object)
+        {
+            BaseAddress = new Uri(_settings.BaseUrl)
+        };
+
+        var service = new ItchApiService(httpClient, _options, _mockLogger.Object);
+
+        // Act
+        var result = await service.GetGameDataAsync("creator", "nonexistent-game");
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.Errors);
+        Assert.NotEmpty(result.Errors);
+    }
+
+    [Fact]
+    public async Task SearchGamesAsync_WithHttpError_ReturnsErrorResponse()
+    {
+        // Arrange
+        var httpMessageHandler = CreateMockHttpMessageHandler(
+            HttpStatusCode.BadRequest,
+            JsonSerializer.Serialize(new { errors = new[] { "Invalid search query" } }));
+
+        var httpClient = new HttpClient(httpMessageHandler.Object)
+        {
+            BaseAddress = new Uri(_settings.BaseUrl)
+        };
+
+        var service = new ItchApiService(httpClient, _options, _mockLogger.Object);
+
+        // Act
+        var result = await service.SearchGamesAsync("", page: 1);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.Errors);
+        Assert.NotEmpty(result.Errors);
+    }
+
     private Mock<HttpMessageHandler> CreateMockHttpMessageHandler(
         HttpStatusCode statusCode,
         string responseContent)
