@@ -5,7 +5,8 @@
       "Bash(dotnet clean:*)",
       "Bash(dotnet restore:*)",
       "Bash(dotnet test:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(dotnet run:*)"
     ],
     "deny": [],
     "ask": []
