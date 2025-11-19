@@ -84,6 +84,18 @@ Set your API key in `appsettings.json` (see [Configuration](#configuration)). Th
 
 ## API Endpoints
 
+### Health Check
+
+#### Health Status
+```
+GET /health
+```
+Returns the health status of the API. This endpoint is useful for monitoring and load balancer health checks.
+
+**Response**:
+- `200 OK` with `Healthy` status if the API is running
+- No authentication required
+
 ### Users
 
 #### Get Credentials Information
