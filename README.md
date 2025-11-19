@@ -265,28 +265,29 @@ docker run -p 5000:8080 -p 5001:8081 \
 ```
 itch-io-api/
 ├── src/                              # Application source code
-│   ├── Controllers/                  # API Controllers
-│   │   ├── GamesController.cs        # Games endpoints
-│   │   ├── UsersController.cs        # User profile endpoints
-│   │   ├── DownloadKeysController.cs # Download keys endpoints
-│   │   └── PurchasesController.cs    # Purchases endpoints
-│   ├── Models/                       # Data models
-│   │   ├── ItchUser.cs               # User model
-│   │   ├── ItchGame.cs               # Game model
-│   │   ├── Upload.cs                 # Upload model
-│   │   ├── DownloadKey.cs            # Download key model
-│   │   ├── Purchase.cs               # Purchase model
-│   │   ├── CredentialsInfo.cs        # Credentials model
-│   │   ├── ApiResponse.cs            # API response wrappers
-│   │   └── ItchApiSettings.cs        # Configuration model
-│   ├── Services/                     # Business logic layer
-│   │   ├── IItchApiService.cs        # Service interface
-│   │   └── ItchApiService.cs         # itch.io API client implementation
-│   ├── Properties/                   # Project properties
-│   ├── Program.cs                    # Application entry point
-│   ├── appsettings.json              # Configuration
-│   ├── appsettings.Development.json  # Development configuration
-│   └── ItchIoApi.csproj              # Project file
+│   └── ItchIoApi/                    # Main API project
+│       ├── Controllers/              # API Controllers
+│       │   ├── GamesController.cs    # Games endpoints
+│       │   ├── UsersController.cs    # User profile endpoints
+│       │   ├── DownloadKeysController.cs # Download keys endpoints
+│       │   └── PurchasesController.cs # Purchases endpoints
+│       ├── Models/                   # Data models
+│       │   ├── ItchUser.cs           # User model
+│       │   ├── ItchGame.cs           # Game model
+│       │   ├── Upload.cs             # Upload model
+│       │   ├── DownloadKey.cs        # Download key model
+│       │   ├── Purchase.cs           # Purchase model
+│       │   ├── CredentialsInfo.cs    # Credentials model
+│       │   ├── ApiResponse.cs        # API response wrappers
+│       │   └── ItchApiSettings.cs    # Configuration model
+│       ├── Services/                 # Business logic layer
+│       │   ├── IItchApiService.cs    # Service interface
+│       │   └── ItchApiService.cs     # itch.io API client implementation
+│       ├── Properties/               # Project properties
+│       ├── Program.cs                # Application entry point
+│       ├── appsettings.json          # Configuration
+│       ├── appsettings.Development.json # Development configuration
+│       └── ItchIoApi.csproj          # Project file
 ├── tests/                            # Test projects
 │   └── ItchIoApi.Tests/              # Unit and integration tests
 │       ├── Controllers/              # Controller tests
