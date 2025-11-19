@@ -405,3 +405,4 @@ FodyWeavers.xsd
 
 # Configuration files with secrets
 **/*appsettings.Development.json
+/src/ItchIoApi/appsettings.Development.json
